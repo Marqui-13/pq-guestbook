@@ -1,6 +1,4 @@
-# ⚛️ Post-Quantum Guestbook
-
-### **PQ Signatures (ML-DSA) in the browser • Verified in Go • Ready for the PQ Web**
+# ⚛️ Post-Quantum Guestbook: PQ Signatures (ML-DSA) in the browser • Verified in Go • Ready for the PQ Web
 
 <br>
 <br>
