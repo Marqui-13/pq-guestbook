@@ -20,6 +20,7 @@ primary_region = 'iad'
   [[services.ports]]
     port = 443
     handlers = ['tls', 'http']
+    tls_options = { "alpn" = ["h2", "http/1.1"], "versions" = ["TLSv1.2", "TLSv1.3"] }
 
 [[vm]]
   memory = '1gb'
