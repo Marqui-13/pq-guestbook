@@ -2,7 +2,8 @@
 
 ### **PQ Signatures (ML-DSA) in the browser • Verified in Go • Ready for the PQ Web**
 
-
+<br>
+<br>
 
 ## Overview
 
@@ -20,7 +21,8 @@ This project is one of the earliest real-world examples of:
 
 **This is *not* a simulation. It is a pure PQ signature system running in production today.**
 
-
+<br>
+<br>
 
 ## ❓ Why This Matters
 
@@ -37,7 +39,8 @@ This project demonstrates:
 
 This is essentially the **“Hello, World” of real post-quantum web applications**.
 
-
+<br>
+<br>
 
 ## 💡 Key Features
 
@@ -62,7 +65,8 @@ This is essentially the **“Hello, World” of real post-quantum web applicatio
 * No build tools, bundlers, or frameworks
 * Works in modern Chromium-based browsers today
 
-
+<br>
+<br>
 
 ## 🔒 Security Model
 
@@ -89,7 +93,8 @@ Because authentication is entirely PQ-signature–based, TLS is *not* part of th
 
 The project remains a **valid demonstration of real post-quantum authentication**, independent of TLS.
 
-
+<br>
+<br>
 
 ### 🧭 Future Roadmap
 
@@ -99,7 +104,8 @@ Support for true PQ TLS could be added by:
 * Using a self-hosted PQ-TLS terminator (OpenSSL-OQS / Rustls-PQ)
 * Migrating to a hosting provider with PQ KEM support when available
 
-  
+<br>
+<br>
 
 ## 🛠 Tech Stack
 
@@ -145,16 +151,22 @@ http://localhost:8080
 
 Sign a message → send to server → server verifies PQ signature.
 
+<br>
+<br>
 
 ## 📚 Screenshots / Demo
 
 
 
+<br>
+<br>
 
 ## 📄 License
 
 MIT.
 
+<br>
+<br>
 
 ## 🤝 Contributing
 
