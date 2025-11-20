@@ -176,3 +176,7 @@ PRs welcome, especially for:
 * WebCrypto implementations
 * Additional ML-DSA variants
 * Browser API hardening
+
+## References
+
+Buchanan, William J (2025). NIST FIPS 204 (ML-DSA) with JavaScript. Asecuritysite.com. https://asecuritysite.com/dilithium/crypt_ml_dsa
