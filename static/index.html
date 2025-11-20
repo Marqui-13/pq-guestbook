@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>⚛️ Post-Quantum Guestbook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .dropdown {
+            font-size: 16px;
+            border: 2px solid grey;
+            width: 100%;
+            border-left: 12px solid green;
+            border-radius: 5px;
+            padding: 14px;
+        }
+
+        pre {
+            font-size: 16px;
+            border: 2px solid grey;
+            width: 100%;
+            border-left: 12px solid green;
+            border-radius: 5px;
+            padding: 14px;
+        }
+
+        textarea {
+            font-size: 20px;
+            border: 2px solid grey;
+            width: 100%;
+            border-radius: 5px;
+            padding: 14px;
+        }
+
+        body { font-family: ui-monospace, Menlo, monospace; background:#000; color:#0f0; padding:2rem; line-height:1.6; }
+        h1 { font-size: 2.5rem; text-align:center; margin-bottom:0.5rem; }
+        .badge { background:#003300; padding:0.2rem 0.8rem; border-radius:99px; font-size:0.8rem; }
+        input, button { background:#001100; color:#0f0; border:1px solid #0f0; padding:0.8rem; width:100%; margin:0.5rem 0; font-family:inherit; }
+        button { cursor:pointer; font-weight:bold; }
+        button:hover { background:#003300; }
+        button.narrow { width:auto; }
+        .msg { background:#001100; padding:1rem; margin:1rem 0; border-left:4px solid #0f0; white-space:pre-wrap; }
+        #status { position:fixed; bottom:1rem; right:1rem; background:#000; padding:1rem; border:1px solid #0f0; max-width:300px; }
+    </style>
+</head>
+<body>
+    <h1>⚛️ Post-Quantum Guestbook</h1>
+    <p style="text-align:center">
+        TLS: hybrid X25519+Kyber768<br>
+        Every message signed with pure <b>ML-DSA</b> (client-side in browser)<br>
+        <span class="badge">Harvest-now-decrypt-later & trust-now-forge-later proof</span>
+    </p>
+
+    <div style="max-width:800px; margin:2rem auto">
+        <h2>ML-DSA</h2>
+        <table width="50%">
+            <tr>
+                <td style="text-align:left">
+                    <p>
+                        <input id="genkey" class="narrow" type="button" value="Re-generate Keys" />
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <th width="15%" valign="top">Message</th>
+                <td>
+                    <textarea cols="20" id="message" name="message" rows="2" style="width:100%"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th width="15%">Method</th>
+                <td>
+                    <div class="dropdown">
+                        <select name="method" id="method">
+                            <option value="ml_dsa44">ML-DSA-44</option>
+                            <option value="ml_dsa65" selected>ML-DSA-65</option>
+                            <option value="ml_dsa87">ML-DSA-87</option>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th width="15%" valign="top">Signature</th>
+                <td>
+                    <pre id="sign" valign="top"></pre>
+                </td>
+            </tr>
+            <tr>
+                <th width="15%" valign="top">Verify</th>
+                <td>
+                    <pre id="verify"></pre>
+                </td>
+            </tr>
+        </table>
+
+        <h2>Generated keys</h2>
+        <table width="100%">
+            <tr>
+                <th width="15%" valign="top">Public Key</th>
+                <td>
+                    <pre id="publicKey"></pre>
+                </td>
+            </tr>
+            <tr>
+                <th width="15%" valign="top">Private Key</th>
+                <td>
+                    <pre id="privateKey"></pre>
+                </td>
+            </tr>
+        </table>
+
+        <input id="name" placeholder="Your name (author)" required>
+        <button id="post">🚀 Sign with ML-DSA & Post to Guestbook</button>
+    </div>
+
+    <div id="entries" style="max-width:800px; margin:2rem auto"></div>
+
+    <div id="status">Loading messages…</div>
+
+    <script type="module">
+    // Import from ml-dsa.js subpath to get correct exports
+        import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
+
+    const algos = { ml_dsa44, ml_dsa65, ml_dsa87 };
+
+    let privateKey, publicKey;
+
+    function toHex(bytes) {
+        return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function genKey() {
+        const method = document.getElementById('method').value;
+        const algo = algos[method];
+
+        // Use cryptographically secure randomness
+        const seed = crypto.getRandomValues(new Uint8Array(32));
+        const keys = algo.keygen(seed);
+
+        privateKey = keys.secretKey;
+        publicKey = keys.publicKey;
+
+        document.getElementById('publicKey').innerText  = `Length: ${publicKey.length}\n${toHex(publicKey)}`;
+        document.getElementById('privateKey').innerText = `Length: ${privateKey.length}\n${toHex(privateKey)}`;
+    }
+
+    async function signLocal() {
+        const method = document.getElementById('method').value;
+        const algo = algos[method];
+        // Sign just the message text for display preview
+        const message = new TextEncoder().encode(document.getElementById("message").value);
+        const signature = algo.sign(message, privateKey);
+
+        document.getElementById('sign').innerText = `Length: ${signature.length}\n${toHex(signature)}`;
+
+        const isValid = algo.verify(signature, message, publicKey);
+        document.getElementById('verify').innerText = isValid ? "Valid Signature ✓" : "Invalid Signature ✗";
+    }
+
+    // Post to guestbook
+    document.getElementById('post').onclick = async () => {
+        const author = document.getElementById('name').value.trim();
+        const content = document.getElementById('message').value.trim();
+        if (!author || !content) return alert("Name and message required");
+
+        const ts = Date.now();
+        // Match server's reconstruction: fmt.Sprintf("%d", m.Timestamp)
+        const toSign = new TextEncoder().encode(author + content + String(ts));
+
+        const method = document.getElementById('method').value;
+        const algo = algos[method];
+        const sig = algo.sign(toSign, privateKey);
+
+        const toBase64 = (u8) => btoa(String.fromCharCode(...u8)).replace(/=+$/, '');
+
+        const payload = {
+            author,
+            content,
+            ts,
+            sig: toBase64(sig),
+            pubkey: toBase64(publicKey)
+        };
+
+        console.log('Posting:', { author, content, ts, sigLen: sig.length, pubkeyLen: publicKey.length });
+
+        const res = await fetch('/api/post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            document.getElementById('message').value = '';
+            loadMessages();
+            document.getElementById('status').textContent = "Posted with real ML-DSA!";
+        } else {
+            const txt = await res.text();
+            console.error('Server error:', txt);
+            alert("Server rejected signature: " + txt);
+        }
+    };
+
+    // Load existing messages
+    async function loadMessages() {
+        try {
+            const res = await fetch('/api/messages');
+            const messages = await res.json();
+            document.getElementById('entries').innerHTML = messages.map(m => `
+                <div class="msg">
+                    <strong>${escape(m.author)}</strong> <small>@ ${new Date(m.ts).toLocaleTimeString()}</small><br>
+                    ${escape(m.content)}<br><br>
+                    <small>✓ ML-DSA signature verified on server</small>
+                </div>
+            `).join('');
+            document.getElementById('status').textContent = `${messages.length} quantum-safe messages`;
+        } catch (e) {
+            document.getElementById('status').textContent = "Loading…";
+        }
+    }
+
+    function escape(s) {
+        return s.replace(/[&<>"']/g, c => "&#" + c.charCodeAt(0) + ";");
+    }
+
+    // Init
+    setInterval(loadMessages, 10000);
+    loadMessages();
+
+    document.getElementById("message").value = "Hello from a quantum-resistant browser!";
+    await genKey();
+    await signLocal();
+
+    document.getElementById("genkey").onclick = async () => { await genKey(); await signLocal(); };
+    document.getElementById("message").oninput = signLocal;
+    document.getElementById("method").onchange = async () => { await genKey(); await signLocal(); };
+</script>
+</body>
+</html>
