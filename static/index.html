@@ -47,7 +47,7 @@
     <p style="text-align:center">
         Support for TLS 1.2 & 1.3<br>
         Every message signed with pure <b>ML-DSA</b> (client-side in browser)<br>
-        <span class="badge">Harvest-now-decrypt-later & trust-now-forge-later proof</span>
+        <span class="badge">Harvest/Trust-now-decrypt/forge-later & trust-now-forge-later proof</span>
     </p>
 
     <div style="max-width:800px; margin:2rem auto">
@@ -118,7 +118,7 @@
 
     <script type="module">
     // Import from ml-dsa.js subpath to get correct exports
-        import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
+    import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
 
     const algos = { ml_dsa44, ml_dsa65, ml_dsa87 };
 
@@ -146,6 +146,7 @@
     async function signLocal() {
         const method = document.getElementById('method').value;
         const algo = algos[method];
+        
         // Sign just the message text for display preview
         const message = new TextEncoder().encode(document.getElementById("message").value);
         const signature = algo.sign(message, privateKey);
@@ -163,12 +164,17 @@
         if (!author || !content) return alert("Name and message required");
 
         const ts = Date.now();
+        
         // Match server's reconstruction: fmt.Sprintf("%d", m.Timestamp)
         const toSign = new TextEncoder().encode(author + content + String(ts));
-
         const method = document.getElementById('method').value;
         const algo = algos[method];
         const sig = algo.sign(toSign, privateKey);
+
+        // Collect browser metadata
+        const browser = navigator.userAgentData?.brands?.[0]?.brand + " " + navigator.userAgentData?.brands?.[0]?.version;
+        const platform = navigator.userAgentData?.platform || navigator.platform;
+        const ua = navigator.userAgent;
 
         const toBase64 = (u8) => btoa(String.fromCharCode(...u8)).replace(/=+$/, '');
 
@@ -177,7 +183,10 @@
             content,
             ts,
             sig: toBase64(sig),
-            pubkey: toBase64(publicKey)
+            pubkey: toBase64(publicKey),
+            browser,
+            platform,
+            ua
         };
 
         console.log('Posting:', { author, content, ts, sigLen: sig.length, pubkeyLen: publicKey.length });
@@ -209,6 +218,8 @@
                     <strong>${escape(m.author)}</strong> <small>@ ${new Date(m.ts).toLocaleTimeString()}</small><br>
                     ${escape(m.content)}<br><br>
                     <small>✓ ML-DSA signature verified on server</small>
+                    <small>• ${escape(m.browser || "Unknown browser")} detected</small>
+                    <small>• ${escape(m.platform || "")} detected</small>
                 </div>
             `).join('');
             document.getElementById('status').textContent = `${messages.length} quantum-safe messages`;
