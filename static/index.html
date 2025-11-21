@@ -139,8 +139,8 @@
         privateKey = keys.secretKey;
         publicKey = keys.publicKey;
 
-        document.getElementById('publicKey').innerText  = `Length: ${publicKey.length}\n${toHex(publicKey)}`;
-        document.getElementById('privateKey').innerText = `Length: ${privateKey.length}\n${toHex(privateKey)}`;
+        document.getElementById('publicKey').innerText  = `Bytes: ${publicKey.length}\n${toHex(publicKey)}`;
+        document.getElementById('privateKey').innerText = `Bytes: ${privateKey.length}\n${toHex(privateKey)}`;
     }
 
     async function signLocal() {
@@ -150,7 +150,7 @@
         const message = new TextEncoder().encode(document.getElementById("message").value);
         const signature = algo.sign(message, privateKey);
 
-        document.getElementById('sign').innerText = `Length: ${signature.length}\n${toHex(signature)}`;
+        document.getElementById('sign').innerText = `Bytes: ${signature.length}\n${toHex(signature)}`;
 
         const isValid = algo.verify(signature, message, publicKey);
         document.getElementById('verify').innerText = isValid ? "Valid Signature ✓" : "Invalid Signature ✗";
