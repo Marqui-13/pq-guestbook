@@ -156,7 +156,13 @@ Sign a message → send to server → server verifies PQ signature.
 
 ## 📚 Screenshots / Demo
 
+### Benchmarks
+![Benchmarks](https://ibb.co/CKKMtKz4)
 
+## UI
+![Dashboard](https://ibb.co/hxN0psPH)
+![Dashboard](https://ibb.co/R4zDwXzZ)
+![Dashboard](https://ibb.co/bRCBySkL)
 
 <br>
 <br>
