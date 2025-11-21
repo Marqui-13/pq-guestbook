@@ -160,9 +160,9 @@ Sign a message → send to server → server verifies PQ signature.
 ![Benchmarks](images/mldsa_benchmarks.PNG)
 
 ## UI
-![Dashboard](https://ibb.co/hxN0psPH)
-![Dashboard](https://ibb.co/R4zDwXzZ)
-![Dashboard](https://ibb.co/bRCBySkL)
+![Dashboard](images/pq_guestbook_dashboard1.PNG)
+![Dashboard](images/pq_guestbook_dashboard2.PNG)
+![Dashboard](images/pq_guestbook_dashboard3.PNG)
 
 <br>
 <br>
