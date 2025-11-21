@@ -18,8 +18,12 @@ type Message struct {
 	Author    string `json:"author"`
 	Content   string `json:"content"`
 	Timestamp int64  `json:"ts"`
+	Algo      string `json:"algo"`
 	Signature string `json:"sig"`
-	PubKey    string `json:"pubkey"` // Base64-encoded pubkey bytes
+	PubKey    string `json:"pubkey"`
+	Browser   string `json:"browser"`  // e.g. "Chrome 120"
+	Platform  string `json:"platform"` // e.g. "Windows 10"
+	UserAgent string `json:"ua"`       // optional full UA
 }
 
 var (
