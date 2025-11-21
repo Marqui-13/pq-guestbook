@@ -118,7 +118,7 @@
 
     <script type="module">
     // Import from ml-dsa.js subpath to get correct exports
-    import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
+        import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
 
     const algos = { ml_dsa44, ml_dsa65, ml_dsa87 };
 
@@ -146,7 +146,6 @@
     async function signLocal() {
         const method = document.getElementById('method').value;
         const algo = algos[method];
-        
         // Sign just the message text for display preview
         const message = new TextEncoder().encode(document.getElementById("message").value);
         const signature = algo.sign(message, privateKey);
@@ -164,7 +163,6 @@
         if (!author || !content) return alert("Name and message required");
 
         const ts = Date.now();
-        
         // Match server's reconstruction: fmt.Sprintf("%d", m.Timestamp)
         const toSign = new TextEncoder().encode(author + content + String(ts));
         const method = document.getElementById('method').value;
@@ -215,7 +213,7 @@
             const messages = await res.json();
             document.getElementById('entries').innerHTML = messages.map(m => `
                 <div class="msg">
-                    <strong>${escape(m.author)}</strong> <small>@ ${new Date(m.ts).toLocaleTimeString()}</small><br>
+                    <strong>${escape(m.author)}</strong> <small>@ ${new Date(m.ts).toLocaleString()}</small><br>
                     ${escape(m.content)}<br><br>
                     <small>✓ ML-DSA signature verified on server</small>
                     <small>• ${escape(m.browser || "Unknown browser")} detected</small>
