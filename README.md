@@ -157,7 +157,7 @@ Sign a message → send to server → server verifies PQ signature.
 ## 📚 Screenshots / Demo
 
 ### Benchmarks
-![Benchmarks](images/mldsa_benchmarks.png)
+![Benchmarks](images/mldsa_benchmarks.PNG)
 
 ## UI
 ![Dashboard](https://ibb.co/hxN0psPH)
