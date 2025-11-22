@@ -1,6 +1,7 @@
 # ⚛️ Post-Quantum Guestbook: PQ Signatures (ML-DSA) in the browser • Verified in Go • Ready for the PQ Web
 
 <br>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <br>
 
 ## Overview
