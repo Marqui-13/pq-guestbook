@@ -37,8 +37,7 @@ This project demonstrates:
 
 ### 🔐 A browser that acts as a **true PQ identity**, no servers or extensions needed
 
-This is essentially the **“Hello, World” of real post-quantum web applications**.
-
+This is essentially the **“Hello, World” of real post-quantum web applications**. Built to help onboard developers/engineers/researchers to PQC, shared initially in Cyfrin discord. Join us!: https://discord.gg/cyfrin
 <br>
 <br>
 
