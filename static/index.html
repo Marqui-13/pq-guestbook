@@ -3,12 +3,44 @@
 <head>
     <meta charset="utf-8">
     <title>⚛️ Post-Quantum Guestbook</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="application-name" content="pq-guestbook">
+    <meta name="description" content="pq-guestbook — educational PQC onboarding: client-side ML-DSA signing (JS) with server-side verification (Go + circl).">
+    <meta name="author" content="Marquivion Orr">
+    <meta name="generator" content="pq-guestbook">
+
+    <link rel="canonical" href="https://pq-guestbook.fly.dev">
+    <meta name="repository" content="https://github.com/Marqui-13/pq-guestbook">
+    <meta name="license" content="MIT">
+
+    <meta property="og:title" content="pq-guestbook — A Post-Quantum Signed Guestbook">
+    <meta property="og:description" content="A lightweight educational onboarding experiment using client-side ML-DSA signatures in the browser with server-side Go/circl verification. Future-proof cryptography, simple UX.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pq-guestbook.fly.dev">
+    <meta property="og:site_name" content="pq-guestbook">
+    <meta property="og:locale" content="en_US">
+
+    <meta property="og:image" content="https://pq-guestbook.fly.dev/og-image.jpeg">
+    <meta property="og:image:alt" content="pq-guestbook post-quantum cryptography demo">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="pq-guestbook — A Post-Quantum Signed Guestbook">
+    <meta name="twitter:description" content="Browser-side ML-DSA keygen & signatures. Server-side Go/circl verification. A minimal PQC demo built to help onboard devs to PQC.">
+    <meta name="twitter:image" content="https://pq-guestbook.fly.dev/og-image.jpeg">
+    <meta name="build" content="2025-11-23">
+
     <style>
+        *, html {
+            scroll-behavior: smooth;
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+        }
         .dropdown {
             font-size: 16px;
             border: 2px solid grey;
-            width: 100%;
             border-left: 12px solid green;
             border-radius: 5px;
             padding: 14px;
@@ -17,14 +49,19 @@
         pre {
             font-size: 16px;
             border: 2px solid grey;
-            width: 100%;
+            /* width: 40%; */
             border-left: 12px solid green;
             border-radius: 5px;
             padding: 14px;
         }
 
+        table {
+            border-collapse: collapse;
+        }
+        
+
         textarea {
-            font-size: 20px;
+            font-size: 14px;
             border: 2px solid grey;
             width: 100%;
             border-radius: 5px;
@@ -39,7 +76,78 @@
         button:hover { background:#003300; }
         button.narrow { width:auto; }
         .msg { background:#001100; padding:1rem; margin:1rem 0; border-left:4px solid #0f0; text-align: left; }
-        #status { position:fixed; bottom:1rem; right:1rem; background:#000; padding:1rem; border:1px solid #0f0; max-width:300px; }
+        #status { opacity: 0.7; position:fixed; bottom:1rem; right:6rem; background:#000; padding:1rem; border:1px solid #0f0; max-width:300px; }
+
+        .pg-footer {
+            background: #0b1220;
+            color: #cfdff6;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding: 16px 20px;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            font-size: 13px;
+        }
+
+        .pg-footer__inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .pg-meta { color: #9fb1ff; margin-top: 6px; display:block; font-size: 12px; }
+
+        .pg-footer__right { display: flex; gap: 12px; align-items: center; }
+
+        .pg-github {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 8px;
+            color: #e6edf3;
+            background: transparent;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .pg-github svg { display: block; }
+        .pg-github__text { font-size: 13px; }
+
+        .pg-license, .pg-contact {
+            color: #9fb1ff;
+            text-decoration: none;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .pg-license:hover, .pg-contact:hover, .pg-github:hover { opacity: 0.95; transform: translateY(-1px); transition: .12s ease; }
+
+        @media (max-width:640px){
+            .pg-footer__inner { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .pg-footer__right { width:100%; justify-content: flex-start; gap: 8px; }
+        }
+
+        .pg-legal {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #7f8fb3;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            line-height: 1.4;
+        }
+
+        .pg-legal a {
+            color: #9fb1ff;
+            text-decoration: none;
+        }
+
+        .pg-legal a:hover {
+            opacity: 0.9;
+        }
+
     </style>
 </head>
 <body>
@@ -50,24 +158,18 @@
         <span class="badge">Harvest/Trust-now-decrypt/forge-later</span>
     </p>
 
-    <div style="max-width:800px; margin:2rem auto">
-        <h2>ML-DSA</h2>
-        <table width="50%">
+    <br><br/><input id="genkey" class="narrow" type="button" value="Re-generate Keys" /><br><br/>
+
+    <div>
+        <table width="100%">
             <tr>
-                <td style="text-align:left">
-                    <p>
-                        <input id="genkey" class="narrow" type="button" value="Re-generate Keys" />
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <th width="15%" valign="top">Message</th>
+                <th style="text-align: left;">Message</th>
                 <td>
-                    <textarea cols="20" id="message" name="message" rows="2" style="width:100%"></textarea>
+                    <textarea cols="20" id="message" name="message" rows="2" style="text-align: left;"></textarea>
                 </td>
             </tr>
             <tr>
-                <th width="15%">Method</th>
+                <th style="text-align: left;">Method</th>
                 <td>
                     <div class="dropdown">
                         <select name="method" id="method">
@@ -79,13 +181,13 @@
                 </td>
             </tr>
             <tr>
-                <th width="15%" valign="top">Signature</th>
+                <th style="text-align: left;">Sig</th>
                 <td>
                     <pre id="sign" valign="top"></pre>
                 </td>
             </tr>
             <tr>
-                <th width="15%" valign="top">Verify</th>
+                <th style="text-align: left;">Verify</th>
                 <td>
                     <pre id="verify"></pre>
                 </td>
@@ -95,21 +197,21 @@
         <h2>Generated keys</h2>
         <table width="100%">
             <tr>
-                <th width="15%" valign="top">Public Key</th>
+                <th style="text-align: left;">Public Key</th>
                 <td>
                     <pre id="publicKey"></pre>
                 </td>
             </tr>
             <tr>
-                <th width="15%" valign="top">Private Key</th>
+                <th style="text-align: left;">Private Key</th>
                 <td>
                     <pre id="privateKey"></pre>
                 </td>
             </tr>
         </table>
 
-        <input id="name" placeholder="Your name (author)" required>
-        <button id="post">🚀 Sign with ML-DSA & Post to Guestbook</button>
+        <br><br/><input id="name" placeholder="Your name (author)" required>
+        <button id="post">✍️ Sign with ML-DSA & Post to Guestbook</button>
     </div>
 
     <div id="entries" style="max-width:800px; margin:2rem auto"></div>
@@ -118,7 +220,47 @@
 
     <script type="module">
     // Import from ml-dsa.js subpath to get correct exports
-        import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
+    import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
+    
+    // Wrap long hex/base64 into readable rows for display abstraction
+    function wrapRows(str, width = 64) {
+        let out = [];
+        for (let i = 0; i < str.length; i += width) {
+            out.push(str.slice(i, i + width));
+        }
+        return out.join("\n");
+    }
+
+    // Render truncated + toggleable long field
+    function renderTruncatedField(el, bytes, hex, label = "Key") {
+        const short = `${hex.slice(0, 12)}…${hex.slice(-12)}`;
+        const wrapped = wrapRows(hex, 64);
+
+        el.innerHTML = `
+            <div style="margin-bottom:6px;">Bytes: ${bytes}</div>
+            <div id="${el.id}-short" style="white-space:pre-wrap; word-break:break-word;">${short}</div>
+            <div id="${el.id}-full"
+                style="display:none; margin-top:6px; white-space:pre; font-size:13px; line-height:1.45; max-height:300px; overflow:auto; border-left:3px solid #0f0;">
+                ${wrapped}
+            </div>
+
+            <button id="${el.id}-toggle"
+                    style="position: relative; right: 100px; margin-top:6px; background:#001100; color:#0f0; border:1px solid #0f0; text-align: left; cursor:pointer;">
+                <div style="margin-right: 100px;">View full ${label}</div>
+            </button>
+        `;
+
+        const shortDiv = document.getElementById(`${el.id}-short`);
+        const fullDiv  = document.getElementById(`${el.id}-full`);
+        const toggle   = document.getElementById(`${el.id}-toggle`);
+
+        toggle.onclick = () => {
+            const isOpen = fullDiv.style.display === "block";
+            fullDiv.style.display = isOpen ? "none" : "block";
+            shortDiv.style.display = isOpen ? "block" : "none";
+            toggle.textContent = isOpen ? `View full ${label}` : `Hide full ${label}`;
+        };
+    }
 
     const algos = { ml_dsa44, ml_dsa65, ml_dsa87 };
 
@@ -139,8 +281,19 @@
         privateKey = keys.secretKey;
         publicKey = keys.publicKey;
 
-        document.getElementById('publicKey').innerText  = `Bytes: ${publicKey.length}\n${toHex(publicKey)}`;
-        document.getElementById('privateKey').innerText = `Bytes: ${privateKey.length}\n${toHex(privateKey)}`;
+        renderTruncatedField(
+            document.getElementById('publicKey'),
+            publicKey.length,
+            toHex(publicKey),
+            "Public Key"
+        );
+
+        renderTruncatedField(
+            document.getElementById('privateKey'),
+            privateKey.length,
+            toHex(privateKey),
+            "Private Key"
+        );
     }
 
     async function signLocal() {
@@ -150,7 +303,12 @@
         const message = new TextEncoder().encode(document.getElementById("message").value);
         const signature = algo.sign(message, privateKey);
 
-        document.getElementById('sign').innerText = `Bytes: ${signature.length}\n${toHex(signature)}`;
+        renderTruncatedField(
+            document.getElementById('sign'),
+            signature.length,
+            toHex(signature),
+            "Signature"
+        );
 
         const isValid = algo.verify(signature, message, publicKey);
         document.getElementById('verify').innerText = isValid ? "Valid Signature ✓" : "Invalid Signature ✗";
@@ -230,11 +388,10 @@
         return s.replace(/[&<>"']/g, c => "&#" + c.charCodeAt(0) + ";");
     }
 
-    // Init
-    setInterval(loadMessages, 10000);
+    setInterval(loadMessages, 6000);
     loadMessages();
 
-    document.getElementById("message").value = "Hello from a quantum-resistant browser!";
+    document.getElementById("message").value = "Construct message to sign here.";
     await genKey();
     await signLocal();
 
@@ -243,4 +400,27 @@
     document.getElementById("method").onchange = async () => { await genKey(); await signLocal(); };
 </script>
 </body>
+
+<footer class="pg-footer" aria-label="Site footer">
+  <div class="pg-footer__inner">
+    <div class="pg-footer__right">
+      <a class="pg-github" href="https://github.com/Marqui-13/pq-guestbook" target="_blank" rel="noopener noreferrer" aria-label="pq-guestbook repository on GitHub">
+        <svg height="20" viewBox="0 0 16 16" width="20" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.54 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82a7.7 7.7 0 0 1 2.0-.27c.68 0 1.36.09 2.0.27 1.52-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+        <span class="pg-github__text">View on GitHub</span>
+      </a>
+
+      <div class="pg-legal">
+        <span>© 2025 Marquivion Orr. All rights reserved.</span>
+        <span>•</span>
+        <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT Licensed</a>
+        <span>•</span>
+        <span>This project is experimental and provided without warranty.</span>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
 </html>
