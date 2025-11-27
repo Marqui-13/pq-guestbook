@@ -36,7 +36,6 @@
     <style>
         *, html {
             scroll-behavior: smooth;
-            overflow-x: hidden; /* Hide horizontal scrollbar */
         }
         .dropdown {
             font-size: 16px;
@@ -48,17 +47,13 @@
 
         pre {
             font-size: 16px;
-            border: 2px solid grey;
-            /* width: 40%; */
+            border: 2px solid #808080;
+            width: 100%;
             border-left: 12px solid green;
             border-radius: 5px;
             padding: 14px;
-        }
-
-        table {
-            border-collapse: collapse;
-        }
-        
+            box-sizing: border-box;
+        }     
 
         textarea {
             font-size: 14px;
@@ -66,6 +61,20 @@
             width: 100%;
             border-radius: 5px;
             padding: 14px;
+            box-sizing: border-box; /* prevents overflow */
+        }
+
+        #name {
+            width: 100%;
+            box-sizing: border-box; /* prevents overflow */
+        }
+        #sign {
+            width: 100%;
+            box-sizing: border-box; /* prevents overflow */
+        }
+        #verify {
+            width: 100%;
+            box-sizing: border-box; /* prevents overflow */
         }
 
         body { font-family: ui-monospace, Menlo, monospace; background:#000; color:#0f0; padding:2rem; line-height:1.6; }
@@ -155,7 +164,7 @@
     <p style="text-align:center">
         Support for TLS 1.2 & 1.3<br>
         Every message signed with pure <b>ML-DSA</b> (client-side in browser)<br>
-        <span class="badge">Harvest/Trust-now-decrypt/forge-later</span>
+        <span class="badge">Harvest/Trust-now-decrypt/forge-later proof</span>
     </p>
 
     <br><br/><input id="genkey" class="narrow" type="button" value="Re-generate Keys" /><br><br/>
@@ -181,9 +190,9 @@
                 </td>
             </tr>
             <tr>
-                <th style="text-align: left;">Sig</th>
+                <th style="text-align: left;">Signature</th>
                 <td>
-                    <pre id="sign" valign="top"></pre>
+                    <pre id="sign"></pre>
                 </td>
             </tr>
             <tr>
@@ -222,6 +231,13 @@
     // Import from ml-dsa.js subpath to get correct exports
     import { ml_dsa44, ml_dsa65, ml_dsa87 } from 'https://esm.sh/@noble/post-quantum@latest/ml-dsa.js';
     
+    // Create canonical payload for signing/verifying
+    function canonicalPayload(author, content, ts) {
+        return new TextEncoder().encode(
+            `${author}\n${content}\n${ts}`
+        );
+    }
+
     // Wrap long hex/base64 into readable rows for display abstraction
     function wrapRows(str, width = 64) {
         let out = [];
@@ -300,8 +316,8 @@
         const method = document.getElementById('method').value;
         const algo = algos[method];
         // Sign just the message text for display preview
-        const message = new TextEncoder().encode(document.getElementById("message").value);
-        const signature = algo.sign(message, privateKey);
+        const preview = canonicalPayload("", document.getElementById("message").value, 0);
+        const signature = algo.sign(preview, privateKey);
 
         renderTruncatedField(
             document.getElementById('sign'),
@@ -310,7 +326,7 @@
             "Signature"
         );
 
-        const isValid = algo.verify(signature, message, publicKey);
+        const isValid = algo.verify(signature, preview, publicKey);
         document.getElementById('verify').innerText = isValid ? "Valid Signature ✓" : "Invalid Signature ✗";
     }
 
@@ -321,8 +337,8 @@
         if (!author || !content) return alert("Name and message required");
 
         const ts = Date.now();
-        // Match server's reconstruction: fmt.Sprintf("%d", m.Timestamp)
-        const toSign = new TextEncoder().encode(author + content + String(ts));
+        // Match server's reconstruction: canonical payload
+        const toSign = canonicalPayload(author, content, ts);
         const method = document.getElementById('method').value;
         const algo = algos[method];
         const sig = algo.sign(toSign, privateKey);
@@ -378,7 +394,7 @@
                     <strong>• ${escape(m.platform || "")} detected</strong>
                 </div>
             `).join('');
-            document.getElementById('status').textContent = `${messages.length} quantum-safe messages`;
+            document.getElementById('status').textContent = `${messages.length} quantum-safe message(s)`;
         } catch (e) {
             document.getElementById('status').textContent = "Loading…";
         }
@@ -418,9 +434,7 @@
         <span>•</span>
         <span>This project is experimental and provided without warranty.</span>
       </div>
-
     </div>
   </div>
 </footer>
-
 </html>
