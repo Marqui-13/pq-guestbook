@@ -32,6 +32,7 @@ This document summarizes the security properties, protections, and disclosure pr
 - **Strict signature size + public key size validation**
   Prevents algorithm-downgrade tricks, malformed keys, or verification bypasses.
 
+**For developers who require true hardened, constant-time PQC implementations, Trail of Bits provides professionally verified, side-channel-resistant libraries and tooling that far exceed what is possible in browser-based JavaScript.**
 ---
 
 ## ✔ Network & Application Security
