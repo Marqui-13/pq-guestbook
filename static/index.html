@@ -257,7 +257,7 @@
             <div id="${el.id}-short" style="white-space:pre-wrap; word-break:break-word;">${short}</div>
             <div id="${el.id}-full"
                 style="display:none; margin-top:6px; white-space:pre; font-size:13px; line-height:1.45; max-height:300px; overflow:auto; border-left:3px solid #0f0;">
-                ${wrapped}
+                    <div style="margin:0;padding:0;white-space:pre;">${wrapped}</div>
             </div>
 
             <button id="${el.id}-toggle"
@@ -383,7 +383,7 @@
     // Load existing messages
     async function loadMessages() {
         try {
-            const res = await fetch('/api/messages');
+            const res = await fetch('/api/messages?ts=' + Date.now());
             const messages = await res.json();
             document.getElementById('entries').innerHTML = messages.map(m => `
                 <div class="msg">
@@ -434,6 +434,7 @@
         <span>•</span>
         <span>This project is experimental and provided without warranty.</span>
       </div>
+
     </div>
   </div>
 </footer>
