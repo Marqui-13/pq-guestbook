@@ -149,11 +149,11 @@ openssl rand -hex 32
 **Update main.go**
 
 ```bash
-var rateLimitSecret = []byte("RATE_LIMIT_SECRET")
+var rateLimitSecret = []byte("RATE_LIMIT_SECRET") // For local testing only, replace RATE_LIMIT_SECRET with a 32-byte random string
 ```
 
 ```bash
-const secret = "RATE_LIMIT_SECRET"
+const secret = "RATE_LIMIT_SECRET" // For local testing only, replace RATE_LIMIT_SECRET with a 32-byte random string
 ```
 
 ### Start server
@@ -178,12 +178,43 @@ Sign a message → send to server → server verifies PQ signature.
 ## 📚 Screenshots / Demo
 
 ### Benchmarks
+
 ![Benchmarks](images/mldsa_benchmarks.PNG)
 
+**Run this command for Go backend ns/op benchmarks across security levels**
+
+```bash
+go test -bench .
+```
+
+**Run this command for additional allocation stats:**
+
+```bash
+go test -run=^$ -bench . -benchmem
+```
+
+**Call this in the browser console for JS client-side ns/op benchmarks:**
+
+```bash
+benchPQ();
+```
+
+**Modify JS method value to test different security levels and recall benchPQ(); in browser console:**
+
+```bash
+const method = "ml_dsa65"; // Change to "ml_dsa44" or "ml_dsa87" to test other levels
+```
+
+![Benchmarks](images/frontendbm1.PNG)
+![Benchmarks](images/frontendbm2.PNG)
+![Benchmarks](images/frontendbm3.PNG)
+
+
 ## UI
-![Dashboard](images/pq_guestbook_dashboard1.PNG)
-![Dashboard](images/pq_guestbook_dashboard2.PNG)
-![Dashboard](images/pq_guestbook_dashboard3.PNG)
+
+![Dashboard](images/dashboard1.PNG)
+![Dashboard](images/dashboard2.PNG)
+![Dashboard](images/dashboard3.PNG)
 
 <br>
 <br>
