@@ -209,12 +209,14 @@ const method = "ml_dsa65"; // Change to "ml_dsa44" or "ml_dsa87" to test other l
 ![Benchmarks](images/frontendbm2.PNG)
 ![Benchmarks](images/frontendbm3.PNG)
 
-
+<br><br>
 ## UI
 
 ![Dashboard](images/dashboard1.PNG)
 ![Dashboard](images/dashboard2.PNG)
 ![Dashboard](images/dashboard3.PNG)
+![Dashboard](images/dashboard4.PNG)
+![Dashboard](images/dashboard5.PNG)
 
 <br>
 <br>
