@@ -138,6 +138,24 @@ Support for true PQ TLS could be added by:
 go mod tidy
 ```
 
+### Generate 32-byte random hex using secure random-bytes generator and set equal to RATE_LIMIT_SECRET
+
+**Using openssl**
+
+```bash
+openssl rand -hex 32
+```
+
+**Update main.go**
+
+```bash
+var rateLimitSecret = []byte("RATE_LIMIT_SECRET")
+```
+
+```bash
+const secret = "RATE_LIMIT_SECRET"
+```
+
 ### Start server
 
 ```bash
@@ -148,7 +166,7 @@ go run .
 
 Visit:
 
-```
+```bash
 http://localhost:8080
 ```
 
