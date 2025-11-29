@@ -37,6 +37,7 @@ var (
 	mu       sync.RWMutex
 	replayMu sync.Mutex
 	seen     = make(map[string]map[int64]bool)
+
 	rateMu     sync.Mutex
 	rateLimits = make(map[string]*rateInfo)
 )
@@ -47,7 +48,8 @@ type rateInfo struct {
 }
 
 // Device-ID HMAC, modify if testing locally
-var rateLimitSecret = []byte(os.Getenv("RATE_LIMIT_SECRET"))
+var rateLimitSecret = []byte(os.Getenv("RATE_LIMIT_SECRET")) // Uncomment this line when using environment variable
+//var rateLimitSecret = []byte("RATE_LIMIT_SECRET") // For local testing only
 
 func canonicalPayload(author, content string, ts int64) []byte {
 	// Prevents injection or mismatched signing order
@@ -110,7 +112,6 @@ func allowDevice(id string) bool {
 }
 
 func setSecurityHeaders(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "https://pq-guestbook.fly.dev")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, User-Agent")
@@ -132,6 +133,12 @@ func main() {
 			http.Error(w, "GET only", 405)
 			return
 		}
+
+		// PREVENT CACHING ACROSS DEVICES
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+
 		mu.RLock()
 		defer mu.RUnlock()
 		w.Header().Set("Content-Type", "application/json")
@@ -258,12 +265,17 @@ func main() {
 		messages = append([]Message{m}, messages...)
 		mu.Unlock()
 
+		// Minimal, privacy-respectful audit log
+		log.Printf("accepted post: algo=%s authorLen=%d contentLen=%d", m.Algo, len(m.Author), len(m.Content))
+
 		w.WriteHeader(200)
 		w.Write([]byte(`{"status":"quantum-safe post accepted"}`))
 	})
 
 	// Ensure RATE_LIMIT_SECRET is set
-	secret := os.Getenv("RATE_LIMIT_SECRET")
+	secret := os.Getenv("RATE_LIMIT_SECRET") // Uncomment this line when using environment variable
+	//const secret = "RATE_LIMIT_SECRET" // For local testing only, uncomment and generate a 32-byte random hex using any secure random-bytes generator(openssl rand -hex 32).
+
 	if secret == "" {
 		log.Fatal("RATE_LIMIT_SECRET is not set. Set it using `fly secrets set RATE_LIMIT_SECRET=$(openssl rand -hex 32)`")
 	}
