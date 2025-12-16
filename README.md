@@ -50,7 +50,7 @@ This is essentially the **“Hello, World” of real post-quantum web applicatio
 * Implemented with `@noble/post-quantum` (ML-DSA / Dilithium)
 * Keys generated in the browser
 * Each guestbook entry is **signed client-side**
-* Signatures are **randomized** and unique each time (normal for ML-DSA)
+* Signatures are **randomized and unique each time**, as permitted by the ML-DSA (FIPS-204) standard and implemented by the client-side JavaScript library used in this project.
 
 ### 🔐 **Post-Quantum Verification (Server)**
 
