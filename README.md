@@ -21,8 +21,7 @@ This project is one of the earliest real-world examples of:
 
 ### ✔️ **No elliptic-curve cryptography anywhere in the application authentication path**
 
-**This is *not* a simulation. It is a pure PQ signature system running in production today.**
-
+**This is *not* a simulation. It is a pure PQ signature system running in production today. This project is running live in production today in the sense that it’s deployed on a real public endpoint (Fly.io) and anyone can use it right now. But it’s still best described as an educational app (teaching + research/onboarding) rather than a production product with long-term storage guarantees, SLAs, or enterprise support.**
 <br>
 <br>
 
